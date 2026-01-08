@@ -300,14 +300,14 @@ flowchart TD
 So in a microservice architecture, development, testing, and validation happen independently for each microservice, ensuring faster releases, better isolation, and higher reliability.
 
 ### 1. Developer Work and Unit Testing
-- **Context:** Developers work on files related to a specific feature.
+- **Action:** Developers work on files related to a specific feature (technically preferred over "functionality").
 - **Action:** Run unit tests only for modified units.
 - **Definition:** Unit test = "Did the code I just changed for this feature work correctly on my machine?"
 
-#### In a microservice architecture, developers build features within a microservice, validate those features using unit testing, and only then commit the code to Git, ensuring stability before the CI/CD pipeline starts.
+#### In a microservice architecture, developers build features within a microservice, validate those features using unit testing, and only then commit the code to Git, ensuring stability before the CI/CD pipeline starts. Note: A "Unit" refers only to the specific files modified (e.g., 10 out of 1000), not the entire codebase.
 
 ### 2. Commit to Git and Build (Create Product)
-- **Action:** Commit changes; CI/CD pipeline builds the artifact (jar, image, etc.).
+- **Action:** Commit changes; CI/CD pipeline builds the artifact (jar, war, dll, tar, zip, image, etc.).
 - **Idea:** Source code is raw material; build artifact is the finished product.
 
 #### Unit testing validates only the files modified by a developer for a specific feature, while CI pipelines re-run those tests centrally, followed by integration testing, packaging, and deployment to ensure stability in a multi-developer microservice environment.
@@ -338,7 +338,7 @@ So in a microservice architecture, development, testing, and validation happen i
 #### Regression testing validates that newly added or modified features do not impact existing functionality of the product.
 
 ### 7. UAT / Stage Environment (Real-Like Check)
-- **Action:** User Acceptance Testing in a prod-like environment.
+- **Action:** User Acceptance Testing (UAT) in a prod-like environment (often called **Pre-Production** or **Beta Test**).
 - **Question:** "Is this release ready for real customers?"
 
 #### User Acceptance Testing validates the product from a real customer’s point of view in a production-like environment, ensuring the product is truly ready for release.
@@ -350,5 +350,5 @@ So in a microservice architecture, development, testing, and validation happen i
 #### Load testing ensures the product can handle the expected load before it is approved in UAT and released to production.
 
 ### 8. Promotion to PROD (Release)
-- **Action:** Promote the verified artifact to Production.
+- **Action:** Promote the verified artifact from the Beta/Stage environment to Production.
 - **Method:** Blue-Green or Rolling deployment.
