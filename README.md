@@ -352,3 +352,143 @@ So in a microservice architecture, development, testing, and validation happen i
 ### 8. Promotion to PROD (Release)
 - **Action:** Promote the verified artifact from the Beta/Stage environment to Production.
 - **Method:** Blue-Green or Rolling deployment.
+
+Building Microservices: From Source Code to Deployable Artifact
+Frontend vs Backend Capacity: Frontend services (UI) often need more CPU/memory for rendering and user sessions. Backend services (business logic) need more compute for processing, database connections, and heap memory. Each microservice scales independently based on its load.
+
+Developers commit raw source code to Git. DevOps converts this into a machine‑readable artifact (product/deliverable) through a software build process. This artifact is what gets deployed to QA/Prod.
+
+Software Build Process
+Traditional Compiled Languages (Backend – Java, C#, Go)
+What happens internally:
+
+Compilation: Each .java source file → machine‑readable object files (.class files).
+
+Linking: Object files combined → executable artifact (.jar, .war).
+
+Requirements for Java (Compiled Backend):
+
+JDK (Java Development Kit): Includes javac (compiler), jar.exe (packager), java.exe (runtime), JRE (Java Runtime Environment).
+
+Heap Memory: Java apps need -Xmx settings (for example, -Xmx2g for 2GB heap).
+
+Output: .jar or .war file.
+
+Modern Interpreted Languages (Frontend – Node.js, Python)
+No compilation: Code runs line‑by‑line via interpreter (Node.js runtime).
+
+Output: .zip, .tar.gz, or Docker image containing all *.js/*.html files + dependencies.
+
+Faster builds but may need more runtime resources.
+
+Key Difference: Compiled → faster execution, more build time. Interpreted → faster builds, runtime interpretation overhead.
+
+Java Build with Maven (Compiled Backend Example)
+Maven Directory Structure:
+
+my-microservice/
+├── pom.xml (config file)
+└── src/
+    ├── main/          # Production code
+    │   ├── java/       # .java files
+    │   └── resources/  # configs, properties
+    └── test/           # Test code
+        ├── java/       # Unit test .java files
+        └── resources/  # Test configs
+└── target/           # Generated: .class files, reports, .jar
+
+Maven Build Process (mvn clean package):
+
+Clean: Deletes target/ folder (full rebuild).
+
+Compile: .java → .class files in target/classes/.
+
+Unit Test: Runs tests from src/test/ against src/main/ (reports in target/surefire-reports/).
+
+Package: Creates .jar in target/ (includes .class, resources).
+
+Maven Commands:
+
+mvn clean package                    # Full build: compile + test + package
+mvn clean package -DskipTests=true   # Skip unit tests (faster, risky)
+mvn clean install                    # Builds + installs to local repo
+
+Dependencies: Downloaded to ~/.m2/repository/ on first mvn clean.
+
+Build = Compile + Unit Test + Package.
+
+Node.js Build with NPM (Interpreted Frontend Example)
+Node.js Directory Structure:
+
+my-frontend-service/
+├── package.json (config file)
+├── src/               # .js, .html files
+├── tests/             # Unit test files
+└── node_modules/      # Dependencies (auto-created)
+
+NPM Build Process:
+
+Install: npm install downloads dependencies to node_modules/.
+
+Unit Test: Run tests with framework (Jest, Mocha).
+
+Package: Create .zip/.tar with all *.js, *.html, node_modules/.
+
+NPM Commands:
+
+npm install                    # Download all dependencies
+npm test                       # Run unit tests
+npm ci --production            # Install only production deps (faster for CI/CD)
+npm run build                  # Custom build script (from package.json)
+
+package.json Example:
+
+{
+  "name": "account-service-ui",
+  "scripts": { "test": "jest", "build": "zip -r artifact.zip ." },
+  "dependencies": { "angular": "^1.8.0" }
+}
+
+No compilation: Just bundle files + deps into archive.
+
+Software Deployment Process
+Three Key Steps for Any Artifact (Java/Node.js/Docker):
+
+Install: Copy artifact to target machine (QA/Prod server, container).
+
+Configure: Provide environment‑specific settings (external to artifact).
+
+Start: Run the application (java -jar app.jar or node server.js).
+
+Application Configuration (Outside Artifact)
+Never bundle configs in production artifacts. Provide separately:
+
+| Config Parameter | Example Value             | Purpose             |
+| ---------------- | ------------------------- | ------------------- |
+| DB_HOST          | prod-db.rds.amazonaws.com | Database connection |
+| DB_PORT          | 5432                      | Postgres port       |
+| DB_NAME          | users_prod                | Database name       |
+| DB_USER/PASSWORD | admin/secret              | Auth                |
+| LOG_LEVEL        | ERROR (prod), DEBUG (QA)  | Logging verbosity   |
+| HEAP_MEMORY      | -Xmx4g (Java)             | Memory allocation   |
+| LOG_FILE         | /var/log/server.log       | Log location        |
+
+ava: application.properties or .env.
+Node.js: myserver.config or environment variables.
+
+Log Files: server.log (app errors), access.log (requests), users.log (user actions).
+
+Complete DevOps Pipeline for One Microservice
+
+Developer → Unit Test (local) → Git Commit
+            ↓
+CI/CD → Build (Maven/NPM) → Smoke Test → Artifact (.jar/.zip)
+            ↓
+QA → Functional Test → Integration Test → Regression Test
+            ↓
+Stage → UAT (user acceptance)
+            ↓
+Prod → Deploy (install + config + start) → Monitor
+
+DevOps Role: Automate builds per microservice, manage configs per environment, ensure safe deployments. Frontend builds are lighter/faster (Node.js), backend needs more resources (Java heap).
+
