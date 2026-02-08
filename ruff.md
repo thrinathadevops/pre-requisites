@@ -51,3 +51,24 @@ for java application.properties is the configuration of application. for nodejs 
 if we keep in when in package then not require but in reality we don't keep it in package so we have keep this file when running the application. 
 
 npm ci --production it will install only production dependencies
+
+
+infrastructure as code 
+
+why we nee it, by doing manual it is very difficulty means provisioning will be slow, difficult to scale. 
+
+desired state is what we need.  
+actual state what is actually in the cloud
+
+so we prepare a desired state and we will get actual state by using code. 
+what terrafoem do there are few commands like 
+terraform init it will initialize the terraform download dependencies like providers in (.terraform folder), plugins etc and backend , it will create a statefile.
+terraform validate it will validate the code like syntax errors and it will check the code is compatable.
+terraform plan it will show the actual state and desired state difference meance what we write in the code .tf file it will compare with with actual state present in the statefile, it won't connect directly to the cloud and it shows us we are adding the infrastructure  or destroying the infrastructure.
+
+terraform apply it will connect to the cloud and it will create the infrastructure, as per the desired state.
+
+terraform destroy it will destroy the infrastructure, as per the desired state. while destroying we use traget to destroy the specific resource.
+
+we change dynamicallly when plan or appying using terraform plan --varaible="key=value" during run time can change the value 
+
