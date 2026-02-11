@@ -629,3 +629,237 @@ This **3-tier microservices app** demonstrates **everything** a senior DevOps en
 
 ---
 
+## 🧪 Continuous Delivery Pipeline for 3-Tier App
+
+**Every microservice** (Frontend React/Node, Backend Spring Boot, MySQL schema changes) goes through the **same automated testing → delivery pipeline** across **4 environments**:
+
+Dev → QA → Stage (Pre-Prod) → Production
+
+
+---
+
+### 🔬 **Testing Lifecycle (Per Microservice)**
+
+Each microservice follows this **automated progression**:
+
+Unit Test ──(Dev)──> Smoke Test ──(Dev)──> Functional ──(QA)──>
+Integration ──(QA)──> Regression ──(QA)──> UAT ──(Stage)──> Production
+
+
+| **Test Type**         | **Who**      | **Environment** | **Purpose**                                      |
+|-----------------------|--------------|-----------------|--------------------------------------------------|
+| **Unit Testing**      | Developers   | Local           | Individual code functions work                   |
+| **Smoke Test**        | DevOps       | **Dev**         | Build works, basic functionality passes          |
+| **Functional**        | QA           | **QA**          | Specific feature changes validated               |
+| **Integration**       | QA           | **QA**          | New code + existing code works together          |
+| **Regression**        | QA           | **QA**          | Nothing broke in unaffected areas                |
+| **UAT**               | Stakeholders | **Stage**       | Production-like validation (customer ready)      |
+| **Production Deploy** | DevOps       | **Production**  | Live customer traffic                            |
+
+---
+
+### 🏗️ **4 Environments Strategy**
+
+┌─────────────┐ ┌─────────────┐ ┌─────────────────┐ ┌──────────────┐
+│ DEV │ │ QA │ │ STAGE (Pre-Prod)│ │ PRODUCTION │
+│ │ │ │ │ │ │ │
+│ - Dev work │───▶│ - Functional │───▶│ - UAT │───▶│ - Live users │
+│ - Smoke test│ │ - Integration│ │ - Prod mirror │ │ - Real traffic│
+│ │ │ - Regression │ │ - Load testing │ │ │
+└─────────────┘ └─────────────┘ └─────────────────┘ └──────────────┘
+
+
+**Each environment mirrors the full 3-tier stack**:
+
+Frontend (React/Node) + Backend (Spring Boot) + MySQL (RDS)
+
+
+---
+
+### ⚡ **CI/CD Pipeline (Per Microservice)**
+
+**Independent pipelines** for each microservice, triggered by Git commits:
+
+Frontend Pipeline: Backend Pipeline:
+┌─────────────────┐ ┌──────────────────┐
+│ Git Push │ │ Git Push │
+│ React/Node code │ │ Spring Boot code │
+└─────────┬───────┘ └─────────┬─────────┘
+▼ ▼
+┌─────────────────┐ ┌──────────────────┐
+│ 1. Build │ │ 1. Build │
+│ 2. Unit Test │ │ 2. Unit Test │
+│ 3. Docker Image │ │ 3. Docker Image │
+└─────────┬───────┘ └─────────┬─────────┘
+▼ ▼
+┌─────────────────┐ ┌──────────────────┐
+│ 4. Smoke Test │ ───► DEV ─────────▶│ 4. Smoke Test │
+└─────────┬───────┘ └─────────┬─────────┘
+▼ ▼
+┌─────────────────┐ ┌──────────────────┐
+│ 5. QA Tests │ ───► QA ──────────▶│ 5. QA Tests │
+│ Func/Int/Reg │ │ Func/Int/Reg │
+└─────────┬───────┘ └─────────┬─────────┘
+▼ ▼
+┌─────────────────┐ ┌──────────────────┐
+│ 6. UAT Approval │ ───► STAGE ───────▶│ 6. UAT Approval │
+└─────────┬───────┘ └─────────┬─────────┘
+▼ ▼
+┌─────────────────┐ ┌──────────────────┐
+│ 7. Prod Deploy │ ───► PROD ────────▶│ 7. Prod Deploy │
+└─────────────────┘ └──────────────────┘
+
+
+**Database changes** (MySQL schema/migrations) follow the **same pipeline**.
+
+---
+
+### 🎯 **Pipeline Automation (Jenkins/GitHub Actions)**
+
+```yaml
+# Example: Frontend Microservice Pipeline
+stages:
+  - name: Build & Test
+    jobs:
+      - build: docker build frontend:latest
+      - test: npm test
+      - smoke: deploy-to-dev && curl-health-check
+  
+  - name: QA Testing
+    jobs:
+      - deploy-qa: helm upgrade frontend qa-namespace
+      - func-test: qa-run-functional-tests
+      - integration: qa-run-integration-tests
+      - regression: qa-run-regression-suite
+  
+  - name: UAT & Production
+    jobs:
+      - deploy-stage: helm upgrade frontend stage-namespace
+      - uat-approval: manual-approval-required
+      - deploy-prod: blue-green-deployment production
+
+📊 Visual Pipeline Flow
+
+graph LR
+    A[Code Commit<br/>Frontend OR Backend] --> B[Build + Unit Test]
+    B --> C[Docker Image<br/>Push to Registry]
+    C --> D[Smoke Test<br/>DEV Environment]
+    D --> E[QA Tests<br/>Functional + Integration + Regression]
+    E --> F[UAT<br/>STAGE Environment]
+    F --> G[Production Deploy<br/>Blue-Green]
+    
+    style A fill:#e1f5fe
+    style G fill:#c8e6c9
+
+| DevOps Skill          | What You Automated                                  |
+| --------------------- | --------------------------------------------------- |
+| Multi-Environment     | Dev/QA/Stage/Prod – Full stack in each              |
+| Independent Pipelines | Frontend, Backend, DB changes deploy separately     |
+| Test Automation       | Smoke → Functional → Integration → Regression → UAT |
+| Production Safety     | Blue-green deployments, manual UAT gates            |
+| Microservices         | Each service has independent CI/CD lifecycle        |
+
+## 🔄 Continuous Delivery – Build → Test → Deploy
+
+**Continuous Delivery** means **automating the journey** from developer code commits → QA testing → production deployment.
+
+Developers write code **continuously**, but QA needs a **production-ready build** (not raw code). Your job as DevOps is to **automate this entire flow**.
+
+---
+
+### 🎯 **Core Activities You Automate**
+
+Developer Code ───► BUILD ───► TEST ───► DEPLOY
+(Git commit) (Docker) (QA) (Production)
+
+
+| **Activity**    | **What You Do**                                                                 | **Tool**              |
+|-----------------|---------------------------------------------------------------------------------|-----------------------|
+| **Build**       | Convert code → Docker image → Push to registry                                 | Jenkins/GitHub Actions|
+| **Test**        | Deploy build to QA env → Run automated tests → Approve promotion               | QA automation suite   |
+| **Deploy**      | Promote approved build → Deploy to Stage → Blue-green to Production            | Helm/Terraform/ArgoCD |
+| **Support**     | Monitor pipeline health, fix broken builds, optimize delivery velocity         | Observability stack   |
+
+---
+
+### 🔬 **From Code Commit to Production (Step-by-Step)**
+
+DEV WRITES CODE → Git Push (React OR Spring Boot)
+
+BUILD PIPELINE triggers automatically:
+│
+├─ BUILD: npm build / mvn package → Docker image
+├─ SCAN: Trivy security scan → Checkov IaC scan
+├─ SMOKE: Deploy to Dev → Health checks pass
+└─ PUBLISH: Push image to ECR (tagged: v1.2.3)
+
+QA PULLS BUILD → Runs full test suite on QA env
+
+UAT APPROVAL → Manual gate on Stage env
+
+PRODUCTION DEPLOY → Blue-green rollout
+
+
+**QA never sees raw code** – they get a **complete, tested Docker image** ready for their environment.
+
+---
+
+### ⚙️ **Pipeline Stages Visualized**
+
+```mermaid
+graph LR
+    A[Developer<br/>Code Commit] --> B[Automated Build<br/>Docker Image]
+    B --> C[Security Scans<br/>Trivy/Checkov]
+    C --> D[Smoke Tests<br/>Dev Environment]
+    D --> E[QA Testing<br/>Functional/Integration/Regression]
+    E --> F[UAT Approval<br/>Stage Environment]
+    F --> G[Production Deploy<br/>Blue-Green Rollout]
+    
+    style A fill:#e3f2fd
+    style G fill:#e8f5e8
+
+🏗️ Real Pipeline Code Example
+
+# GitHub Actions / Jenkins Pipeline
+name: Continuous Delivery
+on: [push]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    # BUILD
+    - name: Build Docker Image
+      run: docker build -t frontend:${{ github.sha }} .
+    
+    # SCAN
+    - name: Security Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: frontend:${{ github.sha }}
+    
+    # SMOKE TEST
+    - name: Deploy to Dev & Smoke Test
+      run: |
+        helm upgrade --install frontend dev-namespace \
+          --set image.tag=${{ github.sha }}
+        curl -f http://dev-frontend/health
+    
+    # PUBLISH
+    - name: Push to Registry
+      run: |
+        docker tag frontend:${{ github.sha }} frontend:latest
+        docker push frontend:latest
+
+  qa-approval:
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to QA
+      run: helm upgrade frontend qa-namespace --set image.tag=${{ github.sha }}
+    - name: Wait for QA Approval
+      uses: trstringer/manual-approval@v1
+
+
