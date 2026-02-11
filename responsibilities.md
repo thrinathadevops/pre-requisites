@@ -1,16 +1,27 @@
 As Devops engineer we have to do the following things:
+
 1. Development Responsibilities:
+
     a. 60% of the time we have to do development work.
+
     b. New devlopment (scratch to production)
+
     c. Enhancements (existing applications)
+
     d. New problems (existing applications)
 
 2. Operational Responsibilities:
+
     a. 40% of the time we have to do support work.
+
     b. Rollout
+
     c. Maintenance (backup/upgrade/patching)
+
     d. Monitoring (troubleshooting/scale)
+
     e. Security (iam/trivy/checkov)
+
     f. Cost optimization (cost/resource utilization)
 
 <!-- ================= HERO SUMMARY (TOP OF README) ================= -->
@@ -29,12 +40,12 @@ Operations is about **rolling out that automation across environments, maintaini
 
 ### ⚙️ DevOps Work Distribution
 
-| Area                     | Share of Work | What It Covers                                                                 |
+| Area | Share of Work | What It Covers                                                                 |
 |--------------------------|--------------|-------------------------------------------------------------------------------|
 | **Development**          | **60%**      | Building automation, IaC, pipelines, monitoring, self‑healing, reliability   |
 | **Operations**           | **40%**      | Rollout, maintenance, monitoring, security, cost optimization                |
 
-```mermaid
+
 pie showData
     title DevOps Work Distribution
     "Development (Build & Improve)" : 60
