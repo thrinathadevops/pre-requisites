@@ -34,6 +34,72 @@ Development is not just writing scripts once. It means **designing, building, im
 
 Operations is about **rolling out that automation across environments, maintaining systems, monitoring end‑to‑end, securing infrastructure, and optimizing cost & capacity**.
 
+### DevOps Responsibilities Overview
+
+```mermaid
+graph TB
+    A["DevOps Engineer<br/>60% Development + 40% Operations"]
+    
+    A --> B["Development Responsibilities<br/>60%"]
+    A --> C["Operational Responsibilities<br/>40%"]
+    
+    B --> B1["Build Automation"]
+    B --> B2["Infrastructure as Code"]
+    B --> B3["CI/CD Pipelines"]
+    B --> B4["Monitoring & Observability"]
+    B --> B5["Reliability Engineering"]
+    
+    C --> C1["Rollout & Deployment"]
+    C --> C2["Maintenance<br/>Backup/Upgrade/Patching"]
+    C --> C3["Monitoring &<br/>Troubleshooting"]
+    C --> C4["Security<br/>IAM/Scanning"]
+    C --> C5["Cost Optimization"]
+    
+    B1 --> B1a["Scripts & Tooling"]
+    B1 --> B1b["Environment Provisioning"]
+    B1 --> B1c["Day-2 Operations"]
+    
+    B2 --> B2a["Terraform Modules"]
+    B2 --> B2b["Infrastructure Templates"]
+    B2 --> B2c["Version Control"]
+    
+    B3 --> B3a["Build Pipeline"]
+    B3 --> B3b["Test Automation"]
+    B3 --> B3c["Deploy Pipeline"]
+    
+    B4 --> B4a["Metrics & Logs"]
+    B4 --> B4b["Alerts & Dashboards"]
+    B4 --> B4c["Tracing & APM"]
+    
+    B5 --> B5a["Auto-scaling"]
+    B5 --> B5b["Self-healing Systems"]
+    B5 --> B5c["High Availability"]
+    
+    C1 --> C1a["QA/Staging/Prod"]
+    C1 --> C1b["Blue-Green Deploy"]
+    C1 --> C1c["Canary Rollouts"]
+    
+    C2 --> C2a["Backup & Recovery"]
+    C2 --> C2b["Resource Upgrades"]
+    C2 --> C2c["Dependency Updates"]
+    
+    C3 --> C3a["Infrastructure Health"]
+    C3 --> C3b["Application Health"]
+    C3 --> C3c["Incident Response"]
+    
+    C4 --> C4a["Access Control"]
+    C4 --> C4b["Vulnerability Scanning"]
+    C4 --> C4c["Compliance"]
+    
+    C5 --> C5a["Right-sizing"]
+    C5 --> C5b["Resource Utilization"]
+    C5 --> C5c["Cost Analysis"]
+    
+    style A fill:#e3f2fd
+    style B fill:#c8e6c9
+    style C fill:#ffe0b2
+```
+
 ---
 
 <!-- ================= HIGH-LEVEL VISUAL OVERVIEW ================= -->
@@ -471,15 +537,47 @@ Day 2 Checklist (Forever):
 ### 🎯 **Day 0 → Day 2 in One Visual**
 
 ```mermaid
-timeline
-    title DevOps Project Lifecycle
-    Day 0 : Planning & Design
-         : Architecture, Tools, Best Practices
-    Day 1 : Development & Implementation 
-         : Build Once → Deploy Many
-    Day 2 : Operations & Maintenance
-         : Monitor, Maintain, Secure, Improve
-```
+flowchart TD
+    Start["🚀 New Project Initiated"] --> D0["📋 DAY 0: Planning & Design"]
+    
+    D0 --> D0A["🔍 Requirements Analysis"]
+    D0A --> D0B["🏗️ Architecture Design<br/>(microservices, cloud-native)"]
+    D0B --> D0C["🛠️ Tool Selection<br/>(Terraform, Ansible, Kubernetes, CI/CD)"]
+    D0C --> D0D["📊 Environment Strategy<br/>(QA, Staging, Prod)"]
+    D0D --> D0E["🔒 Security & HA Planning<br/>(IAM, monitoring, compliance)"]
+    D0E --> D0F["✅ Day 0 Complete<br/>(Design Document Ready)"]
+    
+    D0F --> D1["⚙️ DAY 1: Development & Implementation"]
+    
+    D1 --> D1A["💻 Write IaC Code<br/>(Terraform for infra)"]
+    D1A --> D1B["🔄 Build CI/CD Pipelines<br/>(Git → Build → Deploy)"]
+    D1B --> D1C["🐳 Container Strategy<br/>(Dockerfile, Docker registry)"]
+    D1C --> D1D["📦 First Deployment<br/>QA Environment"]
+    D1D --> D1E["🧪 Automated Testing<br/>(unit, integration, functional)"]
+    D1E --> D1F["📈 Deploy to Staging"]
+    D1F --> D1G["✅ Deploy to Production<br/>(Same Code, Different Params)"]
+    D1G --> D1H["✅ Day 1 Complete<br/>(Running in Production)"]
+    
+    D1H --> D2["🔧 DAY 2: Operations & Maintenance"]
+    
+    D2 --> D2A["📊 Monitoring & Alerting<br/>(Prometheus, DataDog, CloudWatch)"]
+    D2A --> D2B["🔄 Log Aggregation & Analysis<br/>(ELK, Loki, Splunk)"]
+    D2B --> D2C["🚨 On-Call & Incident Response<br/>(PagerDuty, runbooks)"]
+    D2C --> D2D["🔒 Security Scanning<br/>(Trivy, Checkov, IAM audits)"]
+    D2D --> D2E["💾 Backup & Disaster Recovery<br/>(automated, tested)"]
+    D2E --> D2F["📈 Performance Optimization<br/>(resource scaling, caching)"]
+    D2F --> D2G["💰 Cost Management<br/>(AWS/GCP/Azure billing review)"]
+    D2G --> D2H["🔁 Continuous Improvement<br/>(Feedback loop → Day 0)"]
+    
+    D2H --> Loop{"Issues or<br/>New Features?"}
+    Loop -->|Yes| D0
+    Loop -->|No| D2H
+    
+    style D0 fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    style D1 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
+    style D2 fill:#fff3e0,stroke:#f57c00,stroke-width:3px
+    style Start fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+
 
 This framework shows recruiters you understand:
 

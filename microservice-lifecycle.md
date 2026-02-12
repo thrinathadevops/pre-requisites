@@ -481,81 +481,145 @@ merge release tag: "PROD"
 
 **Timeline:** Each feature takes 2-5 days for development and testing
 
+**Detailed Flow:**
+
 ```mermaid
-sequenceDiagram
-    participant DEV as Developer
-    participant GIT as Git Repo
-    participant CI as CI/CD Pipeline
-    participant BUILD as Build Server
-    participant QA as QA Environment
-    participant TESTER as QA Tester
-
-    DEV->>GIT: Create feature/user-auth branch
-    loop Daily Development
-        DEV->>DEV: Write code + unit tests
-        DEV->>GIT: git commit + push
-    end
-    GIT->>CI: Trigger webhook
-    CI->>BUILD: Start build job
-    BUILD->>BUILD: Compile code
-    BUILD->>BUILD: Run unit tests
-    BUILD->>BUILD: Static analysis
-    BUILD->>BUILD: Build Docker image
-    BUILD->>QA: Deploy image to QA
-    CI->>TESTER: Notify: Ready for testing
-    TESTER->>TESTER: Run functional tests
-    alt Tests Pass
-        TESTER->>GIT: Approve PR
-        DEV->>GIT: Merge to integration branch
-    else Tests Fail
-        TESTER->>DEV: Report bugs
-        DEV->>GIT: git push fixes
-    end
+flowchart TD
+    Start["👨‍💻 Developer Starts<br/>New Feature"] --> CreateBranch["git checkout -b<br/>feature/user-auth"]
+    
+    CreateBranch --> DevCycle["📝 Development Cycle<br/>(Days 1-4)"]
+    DevCycle --> LocalDev["💻 Write Code Locally"]
+    LocalDev --> LocalTest["✅ Unit Tests<br/>(70% code coverage)"]
+    LocalTest --> LocalBuild["🏗️ Local Docker Build<br/>(Validate Dockerfile)"]
+    LocalBuild --> Commit["📤 Git Commit & Push<br/>git push origin feature/user-auth"]
+    
+    Commit --> WebHook["⚡ Webhook Triggered<br/>(on push to feature branch)"]
+    WebHook --> PipeLine["🔄 CI Pipeline Starts"]
+    
+    PipeLine --> Compile["📦 Stage 1: Compile<br/>- Checkout code<br/>- Resolve dependencies"]
+    Compile --> CompileStatus{"Compile<br/>Successful?"}
+    CompileStatus -->|No| CompileFail["❌ Build Failed<br/>Notify Developer"]
+    CompileFail --> Commit
+    
+    CompileStatus -->|Yes| UnitTest["🧪 Stage 2: Unit Tests<br/>- Run test suite<br/>- Code coverage check"]
+    UnitTest --> UnitStatus{"Tests<br/>Pass?"}
+    UnitStatus -->|No| TestFail["❌ Test Failed<br/>Report to Developer"]
+    TestFail --> Commit
+    
+    UnitStatus -->|Yes| SonarQube["📊 Stage 3: Static Analysis<br/>- Sonarqube scan<br/>- Code quality check"]
+    SonarQube --> SonarStatus{"Quality<br/>Gate Pass?"}
+    SonarStatus -->|No| QualityFail["⚠️ Quality Issues<br/>Developer fixes"]
+    QualityFail --> Commit
+    
+    SonarStatus -->|Yes| SecurityScan["🔒 Stage 4: Security Scan<br/>- Trivy (container scan)<br/>- Checkov (IaC scan)"]
+    SecurityScan --> SecStatus{"Vulnerabilities<br/>Found?"}
+    SecStatus -->|Critical| SecFail["🚫 Critical Issue<br/>Build Failed"]
+    SecFail --> Commit
+    SecStatus -->|Low/None| BuildDocker["🐳 Stage 5: Build Docker Image<br/>- docker build -t<br/>  service:feature-user-auth-b123"]
+    
+    BuildDocker --> Registry["📦 Push to Registry<br/>- Docker registry<br/>- Tag: feature-user-auth-b123"]
+    Registry --> DeployQA["🚀 Stage 6: Deploy to QA<br/>- Pull image from registry<br/>- Deploy to QA environment<br/>- Run smoke tests"]
+    
+    DeployQA --> SmokeTests{"Smoke Tests<br/>Pass?"}
+    SmokeTests -->|No| DeployFail["❌ Deploy Failed<br/>Investigate logs"]
+    DeployFail --> Commit
+    
+    SmokeTests -->|Yes| QAReady["✅ QA Environment Ready<br/>Image: feature-user-auth-b123<br/>Ready for testing"]
+    QAReady --> QATesting["🧑‍💼 QA Testing Phase<br/>(Days 4-5)"]
+    
+    QATesting --> FunctionalTest["🧪 Functional Testing<br/>- User login workflow<br/>- Password reset<br/>- Session management<br/>- Edge cases"]
+    FunctionalTest --> FunctResult{"All Tests<br/>Pass?"}
+    
+    FunctResult -->|No| BugReport["🐛 Bugs Found<br/>Create tickets"]
+    BugReport --> FixBugs["👨‍💻 Developer Fixes<br/>in same branch"]
+    FixBugs --> Commit
+    
+    FunctResult -->|Yes| PRReview["📋 Code Review<br/>- Senior dev reviews code<br/>- Architecture review<br/>- Documentation check"]
+    PRReview --> ReviewStatus{"PR<br/>Approved?"}
+    ReviewStatus -->|No| ReviewComments["💬 Review Comments<br/>Developer addresses"]
+    ReviewComments --> Commit
+    
+    ReviewStatus -->|Yes| MergeToInt["✅ APPROVED<br/>Merge to Integration Branch<br/>git merge feature/user-auth"]
+    MergeToInt --> Cleanup["🧹 Cleanup<br/>- Delete feature branch<br/>- Close PR<br/>- Archive build artifacts"]
+    Cleanup --> End["🎉 Feature Complete<br/>Ready for Integration Testing"]
+    
+    style Start fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style End fill:#d4edda,stroke:#388e3c,stroke-width:2px
+    style PipeLine fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style CompileFail fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+    style TestFail fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+    style QualityFail fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px
+    style SecFail fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+    style DeployFail fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+    style QAReady fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style MergeToInt fill:#d4edda,stroke:#388e3c,stroke-width:2px
 ```
 
-**Workflow:**
+**Sequential Flow (Text Format):**
 ```
-Developer: Code + Unit Test (local)
+Developer starts feature branch
     ↓
-Git: Push to feature/xyz branch
+Local Development: Write code + unit tests
     ↓
-CI Pipeline: Trigger on webhook
+Git push to feature/user-auth
     ↓
-Build Stage: Compile → Unit Tests → Build Docker Image
+Webhook triggers CI Pipeline
     ↓
-Deploy: Automated deployment to QA env
+[AUTOMATED]
+Stage 1: Compile code
+Stage 2: Run unit tests
+Stage 3: Static analysis (Sonarqube)
+Stage 4: Security scan (Trivy, Checkov)
+Stage 5: Build Docker image
+Stage 6: Push to registry
+Stage 7: Deploy to QA
+Stage 8: Smoke tests
     ↓
-QA Testing: Functional testing
+QA Environment Ready (feature-user-auth-b123)
     ↓
-Approval: Merge PR to integration branch
+[MANUAL - QA TEAM]
+Functional testing (user workflows)
+Performance testing (if applicable)
+    ↓
+Bug fixes (if needed) → Developer pushes to same branch → Pipeline re-runs
+    ↓
+Code Review (senior dev approves)
+    ↓
+✅ Merge to Integration Branch
 ```
 
-**Key Points:**
-- Created for each new feature/enhancement
-- Developers work exclusively on feature branches
-- Unit testing completed before code push
-- Automated build triggered on code push
-- Smoke test validates build integrity
-- Functional testing by QA on deployed build
-- PR review required before merge
+**Key Characteristics:**
 
-**Example Git Commands:**
-```bash
-# Create feature branch
-git checkout -b feature/user-authentication
+| Aspect | Details |
+|--------|---------|
+| **Branch** | `feature/<name>` (e.g., `feature/user-auth`) |
+| **Lifetime** | 2-5 days of development |
+| **Builds** | 1 build per feature (can trigger multiple times if bugs found) |
+| **Deployments** | 1 deployment to QA (feature branch env) |
+| **Tests** | Unit + Functional + Security |
+| **Artifacts** | Docker image tagged with build number |
+| **Duration** | 5-30 minutes for full pipeline |
+| **Approval** | PR approval + QA sign-off before merge |
 
-# Work on feature (multiple commits)
-git add .
-git commit -m "add login endpoint"
-git push origin feature/user-authentication
+**CI Pipeline Stages (Automated):**
 
-# Create Pull Request on GitHub/GitLab for code review
+1. **Compile** – Resolve dependencies, compile code
+2. **Unit Tests** – Run tests, check coverage (min 70%)
+3. **Static Analysis** – Sonarqube quality gates
+4. **Security Scan** – Trivy + Checkov for vulnerabilities
+5. **Build Docker** – Create container image
+6. **Registry Push** – Store image in Docker registry
+7. **Deploy QA** – Automated deployment to QA
+8. **Smoke Tests** – Verify deployment succeeded
 
-# Once approved and tested, merge to integration
-git checkout integration
-git merge feature/user-authentication
-git push origin integration
+**Example Build ID & Image Tag:**
 ```
+Feature Branch: feature/user-authentication
+Build ID: b123 (auto-incremented)
+Docker Image: my-service:feature-user-authentication-b123
+Registry: docker.io/company/my-service:feature-user-authentication-b123
+```
+
 
 ---
 
@@ -565,59 +629,160 @@ git push origin integration
 
 **Purpose:** Validate that multiple features work together correctly
 
+**Detailed Flow - "Build Once, Deploy Multiple Times" Pattern:**
+
 ```mermaid
-graph TD
-    A["Multiple Feature Branches<br/>feature/auth<br/>feature/payment<br/>feature/dashboard"] --> B["Merge to Integration Branch"]
-    B --> C["Trigger CI Pipeline"]
-    C --> D["Build Single Image<br/>from integrated code"]
-    D --> E["Deploy to QA"]
-    E --> F["Integration Testing<br/>Test cross-feature interactions"]
-    E --> G["Regression Testing<br/>Test existing functionality"]
-    F --> H{"All Tests Pass?"}
-    G --> H
-    H -->|Yes| I["Ready for Release Branch"]
-    H -->|No| J["Report Bugs<br/>Developers fix in feature branches<br/>Merge fixes to integration again"]
-    J --> C
+flowchart TD
+    Start["🔀 Multiple Features Ready<br/>feature/auth ✅<br/>feature/payment ✅<br/>feature/dashboard ✅"] --> Merge["🤝 Merge to Integration<br/>git checkout integration<br/>git merge feature/auth<br/>git merge feature/payment<br/>git merge feature/dashboard<br/>git push origin integration"]
     
-    style A fill:#fff3cd
-    style I fill:#d4edda
-    style J fill:#f8d7da
+    Merge --> WebHook["⚡ Webhook Triggered<br/>(Integration branch push)"]
+    WebHook --> Pipeline["🔄 CI Pipeline Starts<br/>(Same 8-stage pipeline)"]
+    
+    Pipeline --> Stages["📦 Stages 1-8: Standard Build<br/>✓ Compile<br/>✓ Unit tests<br/>✓ Static analysis<br/>✓ Security scan<br/>✓ Build Docker image<br/>✓ Push to registry<br/>✓ Deploy to QA (Smoke tests)"]
+    
+    Stages --> ImageCreated["🐳 SINGLE Docker Image Created<br/>service:integration-b456<br/>(contains auth+payment+dashboard)"]
+    ImageCreated --> Registry["📦 Image Stored in Registry<br/>docker.io/company/service:integration-b456<br/>(immutable, same for all tests)"]
+    
+    Registry --> DeployDeploy1["🚀 DEPLOY #1<br/>(Same image, different test suite)"]
+    Registry --> DeployDeploy2["🚀 DEPLOY #2<br/>(Same image, different test suite)"]
+    Registry --> DeployDeploy3["🚀 DEPLOY #3<br/>(Same image, different test suite)"]
+    
+    DeployDeploy1 --> TestDeploy1["🧪 Integration Testing #1<br/>- Cross-feature workflows<br/>- Auth → Payment → Dashboard flow<br/>- API interactions<br/>- Database state consistency"]
+    
+    DeployDeploy2 --> TestDeploy2["🔄 Regression Testing #2<br/>- Existing functionality<br/>- Old features still work<br/>- No breaking changes<br/>- Performance benchmarks"]
+    
+    DeployDeploy3 --> TestDeploy3["🔗 End-to-End Testing #3<br/>- Full user workflows<br/>- Login → Purchase → Export<br/>- Edge cases<br/>- Multi-user scenarios"]
+    
+    TestDeploy1 --> Result1{"Integration<br/>Tests Pass?"}
+    TestDeploy2 --> Result2{"Regression<br/>Tests Pass?"}
+    TestDeploy3 --> Result3{"E2E Tests<br/>Pass?"}
+    
+    Result1 -->|No| BugFound["🐛 Bug Found<br/>in integration<br/>between features"]
+    Result2 -->|No| BugFound
+    Result3 -->|No| BugFound
+    
+    BugFound --> NotifyDev["📢 Notify Developers<br/>Which feature caused issue"]
+    NotifyDev --> FixFeature["👨‍💻 Developer Fixes<br/>in feature branch<br/>(e.g., feature/auth)"]
+    FixFeature --> RemergeFeature["🤝 Re-merge Feature<br/>to Integration"]
+    RemergeFeature --> Pipeline
+    
+    Result1 -->|Yes| Result2
+    Result2 -->|Yes| Result3
+    Result3 -->|Yes| AllPass["✅ ALL TESTS PASSED<br/>Integration Cycle Complete"]
+    
+    AllPass --> ReadyRelease["🎉 Ready for Release Branch<br/>Image: service:integration-b456<br/>Candidates: feature/auth, feature/payment, feature/dashboard"]
+    ReadyRelease --> End["📋 Sign-off<br/>Ready for UAT & Production"]
+    
+    style Start fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style ImageCreated fill:#fff3cd,stroke:#ff9800,stroke-width:2px
+    style DeployDeploy1 fill:#c8e6c9,stroke:#4caf50,stroke-width:2px
+    style DeployDeploy2 fill:#c8e6c9,stroke:#4caf50,stroke-width:2px
+    style DeployDeploy3 fill:#c8e6c9,stroke:#4caf50,stroke-width:2px
+    style TestDeploy1 fill:#f1f8e9,stroke:#689f38,stroke-width:2px
+    style TestDeploy2 fill:#f1f8e9,stroke:#689f38,stroke-width:2px
+    style TestDeploy3 fill:#f1f8e9,stroke:#689f38,stroke-width:2px
+    style BugFound fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+    style AllPass fill:#d4edda,stroke:#388e3c,stroke-width:2px
+    style End fill:#d4edda,stroke:#388e3c,stroke-width:2px
 ```
 
-**Workflow:**
+**The "Build Once, Deploy Multiple Times" Philosophy:**
+
 ```
-Multiple Features on Integration Branch
-    ↓ (Build Once, Deploy Multiple Times)
-Build: Create one unified Docker image
-    ↓
-Deploy to QA Environment (First time)
-    ↓
-QA: Integration Testing
-    ↓ (Same image, different test suite)
-Deploy to QA Environment (Second time)
-    ↓
-QA: Regression Testing
+┌─────────────────────────────────────────────────────────────┐
+│           SINGLE BUILD PROCESS (Once)                       │
+├─────────────────────────────────────────────────────────────┤
+│  Compile → Test → Scan → Build Docker → Push to Registry   │
+│           Result: service:integration-b456                 │
+└─────────────────────────────────────────────────────────────┘
+         ↓
+    ┌────┴────┬────────────┬────────────┐
+    ↓         ↓            ↓            ↓
+┌────────┐ ┌────────────┐ ┌──────────┐ ┌──────────┐
+│Deploy#1│ │Deploy#2    │ │Deploy#3  │ │Deploy#4  │
+│Integ   │ │Regression  │ │E2E Tests │ │Load Test │
+│Tests   │ │Tests       │ │(Optional)│ │(Optional)│
+└────────┘ └────────────┘ └──────────┘ └──────────┘
+    ↓         ↓            ↓            ↓
+  Same Docker Image (immutable, guaranteed identical)
+  tested in different ways → Maximum confidence
 ```
 
-**Key Concepts:**
+**Why This Pattern Matters:**
 
-**Build Once, Deploy Multiple Times Pattern:**
-- Single build artifact deployed to multiple test suites
-- Same Docker image tested for integration AND regression
-- Eliminates "works on my build but not on that build" issues
-- Faster testing cycles (reuse builds)
+| Benefit | Explanation |
+|---------|-------------|
+| **Consistency** | Same code tested everywhere = no "works in QA, not prod" |
+| **Speed** | Build once, reuse for all tests = faster feedback |
+| **Reliability** | Test the exact artifact that goes to production |
+| **Cost** | Fewer build resources = lower infrastructure costs |
+| **Traceability** | Single image ID linked to all test results |
+| **Confidence** | Comprehensive testing with identical artifact |
 
-**Testing on Integration Branch:**
+**Sequential Timeline:**
 
-| Test Type | Scope | Purpose |
-|-----------|-------|---------|
-| **Integration Test** | Cross-feature interactions | Verify features work together |
-| **Regression Test** | Entire application | Ensure no existing features broken |
-
-**Example Integration Cycle:**
 ```
-Day 1 Morning: Merge 3 features to integration
-Day 1 Afternoon: Build & Integration Testing
+Day 1, 9:00 AM:   Developers merge 3 features to integration
+Day 1, 9:05 AM:   Webhook triggers pipeline
+Day 1, 9:25 AM:   Single Docker image created: service:integration-b456
+Day 1, 9:30 AM:   [PARALLEL] Deploy to QA env #1, #2, #3
+Day 1, 9:45 AM:   [PARALLEL] Integration testing, Regression testing, E2E testing
+Day 1, 11:00 AM:  All tests pass ✅
+Day 1, 11:30 AM:  Image promoted to Release candidate
+Day 1, 2:00 PM:   Image deployed to UAT
+Day 1, 5:00 PM:   UAT testing complete, ready for production
+Day 2, 10:00 AM:  Blue-Green deployment to production
+```
+
+**Example Integration Cycle in Practice:**
+
+```
+Integration Branch Merges:
+  feature/user-auth (login, password reset) ✅
+  feature/payment (checkout, payment processing) ✅
+  feature/dashboard (analytics, reports) ✅
+
+Build Sequence (Automated):
+  1. Compile: Resolve dependencies for all 3 features
+  2. Unit Tests: 150 tests (50 per feature)
+  3. Security Scan: Check for vulnerabilities in combined code
+  4. Build: Single Docker image with all 3 features
+  5. Tag: service:integration-b456 (b = build, 456 = auto-incremented)
+  6. Registry: docker.io/company/service:integration-b456
+
+Deployment Sequence (Parallel):
+  Deploy #1 (QA Env 1): Integration Testing
+    - Login user → Purchase item → View dashboard
+    - Auth system talks to payment system
+    - Payment system updates dashboard analytics
+    - ✅ All interactions work
+
+  Deploy #2 (QA Env 2): Regression Testing
+    - Old features still work (customer listing, reports)
+    - No breaking changes
+    - Performance: response time < 200ms
+    - ✅ All regression tests pass
+
+  Deploy #3 (QA Env 3): E2E & Load Testing
+    - Simulate 100 concurrent users
+    - Each user: login → purchase → view dashboard
+    - No errors, all tests pass
+    - ✅ System handles load
+
+Result: Image promoted to Release Branch
+```
+
+**Testing Matrix for Integration Cycle:**
+
+| Test Type | Focus | Duration | Environment |
+|-----------|-------|----------|-------------|
+| **Integration Tests** | Feature interactions, APIs, data flow | 15 mins | QA Env 1 |
+| **Regression Tests** | Existing features, no breaking changes | 20 mins | QA Env 2 |
+| **E2E Tests** | Complete user workflows, multi-user | 25 mins | QA Env 3 |
+| **Performance Tests** | Load, response time, resource usage | 10 mins | QA Env 3 |
+| **Security Tests** | Vulnerability scan (Trivy, Checkov) | 5 mins | Build stage |
+
+**Total Integration Cycle: ~1 hour from merge to ready for release** 🚀
 Day 1 Evening: Build & Regression Testing
 Day 2 Morning: All tests pass
 Day 2 Afternoon: Merge to release branch
@@ -655,99 +820,233 @@ git push origin integration
 
 **Purpose:** Final validation before production release
 
+**Detailed Flow - Production-Ready Release Process:**
+
 ```mermaid
-graph TD
-    A["Integration Branch<br/>All features integrated & tested"] --> B["Merge to Release Branch"]
-    B --> C["CI Pipeline Triggered"]
-    C --> D["Build Docker Image<br/>Tag: v1.2.3"]
-    D --> E["Deploy to UAT/Staging"]
-    E --> F["User Acceptance Testing<br/>QA/Customer validates"]
-    F --> G{"UAT Passed?"}
-    G -->|No| H["Report Issues<br/>Developers fix<br/>Bug fixes merged to integration,<br/>then cherry-picked to release"]
-    H --> C
-    G -->|Yes| I["Deploy to Production<br/>Blue-Green Deployment"]
-    I --> J["Smoke Tests in Production"]
-    J --> K{"Prod Smoke Tests Pass?"}
-    K -->|Yes| L["Release Complete<br/>Create git tag"]
-    K -->|No| M["Rollback to Previous<br/>Version"]
+flowchart TD
+    Start["✅ Integration Tests Complete<br/>Image: service:integration-b456"] --> CreateRelease["🏷️ Create Release Branch<br/>git checkout -b release/v1.2.3 integration"]
     
-    style A fill:#e3f2fd
-    style L fill:#c8e6c9
-    style M fill:#f8d7da
+    CreateRelease --> BumpVersion["📝 Version Bump<br/>- Update package.json/pom.xml<br/>- Version: v1.2.3<br/>- Update CHANGELOG<br/>- git commit + push"]
+    
+    BumpVersion --> WebHook["⚡ Webhook Triggered<br/>(Release branch push)"]
+    WebHook --> Pipeline["🔄 CI Pipeline Starts"]
+    
+    Pipeline --> Stages["📦 Build Stages (1-8)<br/>Compile → Tests → Scan → Build"]
+    Stages --> VersionedImage["🐳 Versioned Docker Image<br/>service:v1.2.3<br/>(tagged with semantic version)"]
+    
+    VersionedImage --> Registry["📦 Push to Registry<br/>docker.io/company/service:v1.2.3<br/>(production-ready artifact)"]
+    Registry --> DeployUAT["🚀 Deploy to UAT Environment<br/>(Staging/Pre-prod)")
+    
+    DeployUAT --> UATReady["✅ UAT Environment Ready<br/>service:v1.2.3 running on staging"]
+    UATReady --> ManualGate["⛔ MANUAL APPROVAL GATE<br/>Business Team Reviews"]
+    
+    ManualGate --> BusinessTest["🧪 User Acceptance Testing<br/>- Product owner validates features<br/>- Real business workflows<br/>- Performance acceptable?<br/>- All functionality working?<br/>- Duration: 1-3 days"]
+    
+    BusinessTest --> UATResult{"Business<br/>Approves?"}
+    UATResult -->|No| UATReject["🚫 Issues Found<br/>- Return to development<br/>- Fix in feature branches<br/>- Re-merge to integration<br/>- Re-tag release"]
+    UATReject --> Start
+    
+    UATResult -->|Yes| UATSign["✅ UAT Sign-Off<br/>Product owner approves release"]
+    UATSign --> DeployProd["🚀 BLUE-GREEN DEPLOYMENT<br/>to Production"]
+    
+    DeployProd --> BlueGreen["🔄 Blue-Green Strategy<br/><br/>BEFORE:<br/>Blue Env: v1.2.2 (current)<br/>Green Env: idle<br/><br/>DEPLOYMENT:<br/>Deploy v1.2.3 to Green<br/>Run production smoke tests"]
+    
+    BlueGreen --> ProdSmoke["🧪 Production Smoke Tests<br/>(Same image as UAT)<br/>- Health check API<br/>- Critical workflows<br/>- Database connectivity<br/>- Cache validation<br/>- Duration: 5-10 mins"]
+    
+    ProdSmoke --> SmokeResult{"Smoke Tests<br/>Pass?"}
+    
+    SmokeResult -->|No| Rollback["🔄 ROLLBACK to v1.2.2<br/>- Blue Env stays production<br/>- Green Env marked for investigation<br/>- Incident post-mortem"]
+    Rollback --> Investigate["🔍 Investigation<br/>- Check logs, metrics, traces<br/>- Identify root cause<br/>- Fix issue<br/>- Prepare v1.2.4 patch"]
+    Investigate --> Start
+    
+    SmokeResult -->|Yes| SwitchTraffic["🔀 SWITCH TRAFFIC<br/>Blue → Green<br/>(All traffic to v1.2.3)"]
+    SwitchTraffic --> Released["🎉 RELEASE COMPLETE<br/>v1.2.3 in Production"]
+    
+    Released --> GitTag["📌 Create Git Tag<br/>git tag -a v1.2.3<br/>git push origin v1.2.3"]
+    GitTag --> Cleanup["🧹 Cleanup<br/>- Delete release branch<br/>- Archive build artifacts<br/>- Update release notes"]
+    Cleanup --> Monitor["📊 Production Monitoring<br/>- Watch metrics & logs<br/>- Alert on anomalies<br/>- Performance tracking"]
+    Monitor --> Success["✅ Release Successful<br/>v1.2.3 running in production"]
+    
+    style Start fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style ManualGate fill:#fff3cd,stroke:#f57c00,stroke-width:3px
+    style DeployProd fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style BlueGreen fill:#ffe0b2,stroke:#ff6f00,stroke-width:2px
+    style SwitchTraffic fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style Released fill:#d4edda,stroke:#388e3c,stroke-width:3px
+    style Rollback fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+    style Success fill:#d4edda,stroke:#388e3c,stroke-width:2px
 ```
 
-**Release Approval Gates:**
+**Sequential Release Timeline:**
 
 ```
-Code Ready (Integration) ✅
-    ↓
-Build Created ✅
-    ↓
-Deploy to UAT ✅
-    ↓
-UAT Approved by Business ⛔ MANUAL GATE
-    ↓
-Deploy to Production ✅
-    ↓
-Production Smoke Tests ✅
-    ↓
-RELEASED TO CUSTOMERS 🎉
+Day 1, 10:00 AM:  Merge integration → release branch
+Day 1, 10:05 AM:  CI Pipeline triggers (versioned build)
+Day 1, 10:30 AM:  Docker image created: service:v1.2.3
+Day 1, 10:40 AM:  Deploy to UAT environment
+Day 1, 10:50 AM:  Smoke tests pass on UAT
+Day 1, 11:00 AM:  UAT environment ready for business testing
+Day 1-3:          Business team performs UAT
+Day 3, 4:00 PM:   ✅ UAT approved by product owner
+Day 3, 5:00 PM:   Blue-Green deployment starts
+Day 3, 5:15 PM:   service:v1.2.3 deployed to Green environment
+Day 3, 5:30 PM:   Production smoke tests run
+Day 3, 5:35 PM:   ✅ All smoke tests pass
+Day 3, 5:45 PM:   Traffic switched from Blue to Green
+Day 3, 6:00 PM:   🎉 v1.2.3 live in production
 ```
 
-**Key Points:**
-- Code merged from integration branch (already tested)
-- **Build Once, Deploy Multiple Times** pattern
-  - Same Docker image deployed to UAT
-  - Same Docker image deployed to Production
-- UAT (User Acceptance Testing) in staging environment
-- Final production deployment with automated smoke tests
-- Version tagging for release tracking
+**The Three Docker Images in Release Cycle:**
 
-**Release Deployment Strategies:**
+| Image | Tag | Environment | Duration | Purpose |
+|-------|-----|-------------|----------|---------|
+| **Integration Image** | `service:integration-b456` | QA (Multi-deploy) | Days 1-2 | Integration testing, verified |
+| **Release Image** | `service:v1.2.3` | UAT + Prod | Days 3-∞ | Final release, versioned |
+| **Previous Release** | `service:v1.2.2` | Prod (Blue) | Until rollback | Rollback candidate |
 
-| Strategy | Description | Advantages | Disadvantages |
-|----------|-------------|------------|---|
-| **Blue-Green** | Two identical prod envs, switch traffic | Zero downtime, instant rollback | Double resources |
-| **Canary** | Gradual rollout to subset of users | Risk mitigation, early issue detection | Complex monitoring |
-| **Rolling** | Gradual replacement of instances | Reduced resource usage | More complex |
+**Blue-Green Deployment in Detail:**
 
-**Blue-Green Deployment Example:**
 ```
-BEFORE DEPLOYMENT:
-- Blue Environment: Old version (v1.2.2) - Prod Traffic
-- Green Environment: New version (v1.2.3) - No traffic
+BEFORE RELEASE (5:00 PM):
+┌──────────────────┐           ┌──────────────────┐
+│  Blue (Active)   │           │   Green (Idle)   │
+│  v1.2.2          │           │   (empty)        │
+│  ← 100% traffic  │           │                  │
+└──────────────────┘           └──────────────────┘
 
-DEPLOYMENT STEPS:
-1. Deploy v1.2.3 to Green
-2. Run smoke tests on Green
-3. If tests pass: Switch traffic Blue → Green
-4. If tests fail: Keep traffic on Blue, keep Green for investigation
+DEPLOYMENT PHASE (5:00-5:30 PM):
+┌──────────────────┐           ┌──────────────────┐
+│  Blue (Active)   │           │   Green (Deploy) │
+│  v1.2.2          │           │   v1.2.3         │
+│  ← 100% traffic  │           │   (smoke testing)│
+└──────────────────┘           └──────────────────┘
 
-AFTER DEPLOYMENT:
-- Green Environment: New version (v1.2.3) - Prod Traffic
-- Blue Environment: Old version (v1.2.2) - Ready for rollback
+POST-DEPLOYMENT (5:45 PM - Success):
+┌──────────────────┐           ┌──────────────────┐
+│  Blue (Standby)  │           │  Green (Active)  │
+│  v1.2.2          │           │  v1.2.3          │
+│                  │           │  ← 100% traffic  │
+└──────────────────┘           └──────────────────┘
+
+[Now Green is live, Blue ready for instant rollback]
 ```
 
-**Example Git Commands:**
+**Release Branch Protection:**
+
+```
+Protections on release/* branches:
+✓ Require PR review (minimum 2 approvals)
+✓ Require CI checks to pass
+✓ Dismiss stale PR reviews on new commits
+✓ Require status checks to pass before merge
+✓ Require branches to be up to date before merge
+✓ Restrict who can push to release branch
+```
+
+**UAT Approval Gate - What Gets Checked:**
+
+```
+Product Owner Checklist:
+☑️ Feature A works as specified
+☑️ Feature B works as specified  
+☑️ Feature C works as specified
+☑️ No regressions in existing features
+☑️ Performance acceptable (< 200ms response time)
+☑️ No critical bugs
+☑️ User workflows complete (login → action → logout)
+☑️ Data integrity maintained
+☑️ UI/UX meets requirements
+☑️ Business logic correct
+
+Result: Signed off for production ✅
+```
+
+**Handling Release Branch Bugs:**
+
+```
+Scenario: Bug found during UAT
+
+Flow:
+1. Bug reported in service:v1.2.3 on UAT
+2. Bug is NOT in production yet (still v1.2.2)
+3. Developer fixes in feature branch
+4. Feature branch merged back to integration
+5. Integration branch re-tested
+6. Integration re-merged to release (updated code)
+7. Release branch re-tagged: v1.2.3 (updated)
+8. New Docker image: service:v1.2.3 (rebuilt)
+9. UAT testing repeats with new image
+10. If successful, proceed to production
+
+Key: Version tag stays same (v1.2.3), but code is fixed
+     Release branch reset to latest integration code
+```
+
+**Git Commands for Release:**
+
 ```bash
-# Create release branch from integration
+# Create release branch
 git checkout -b release/v1.2.3 integration
 
-# Bump version in package.json/pom.xml
-# Update CHANGELOG
+# Update version and changelog
+# Edit package.json or pom.xml
+# Update CHANGELOG.md
+git add package.json CHANGELOG.md
 git commit -m "Bump version to 1.2.3"
 git push origin release/v1.2.3
 
-# After deployment to production
+# [Deployment happens through CI/CD]
+# [UAT testing]
+# [Production approval]
+
+# After successful production deployment
 git checkout main
-git merge --no-ff release/v1.2.3
+git merge --no-ff release/v1.2.3 -m "Release v1.2.3"
+
+# Create git tag for release
 git tag -a v1.2.3 -m "Release version 1.2.3"
-git push origin main
+git tag -a v1.2.3 -m "Release notes:
+- Feature A: User authentication
+- Feature B: Payment processing
+- Feature C: Dashboard analytics
+- Bugfixes: 5 issues resolved"
+
+# Push tag to remote
 git push origin v1.2.3
 
-# Delete release branch after tagging
+# Delete release branch
 git push origin --delete release/v1.2.3
+git branch -d release/v1.2.3
 ```
+
+**Release Success Criteria:**
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| **CI Pipeline** | ✅ Pass | All 8 build stages successful |
+| **Docker Image** | ✅ Created | service:v1.2.3 in registry |
+| **UAT Deploy** | ✅ Success | Image runs in staging |
+| **UAT Smoke Tests** | ✅ Pass | Health checks pass |
+| **UAT Business Testing** | ✅ Approved | Product owner signed off |
+| **Production Deploy** | ✅ Success | Blue-Green deployment complete |
+| **Prod Smoke Tests** | ✅ Pass | Critical paths verified |
+| **Traffic Switch** | ✅ Complete | v1.2.3 receiving 100% traffic |
+| **Post-Release** | 🔍 Monitoring | Metrics & logs watched for 24h |
+| **Release Tag** | ✅ Created | git tag v1.2.3 pushed |
+
+**Release Readiness Checklist:**
+
+Before merging to release branch:
+- ✅ All feature branches merged and tested (integration)
+- ✅ Integration branch fully tested (all 3 test types)
+- ✅ No known critical bugs
+- ✅ Performance metrics acceptable
+- ✅ Security scan passed (no critical vulnerabilities)
+- ✅ Documentation updated
+- ✅ Release notes prepared
+- ✅ Rollback plan documented
+- ✅ On-call engineer briefed
+- ✅ Monitoring alerts configured
 
 ---
 
