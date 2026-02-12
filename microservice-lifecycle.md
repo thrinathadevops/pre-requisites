@@ -835,7 +835,7 @@ flowchart TD
     Stages --> VersionedImage["🐳 Versioned Docker Image<br/>service:v1.2.3<br/>(tagged with semantic version)"]
     
     VersionedImage --> Registry["📦 Push to Registry<br/>docker.io/company/service:v1.2.3<br/>(production-ready artifact)"]
-    Registry --> DeployUAT["🚀 Deploy to UAT Environment<br/>(Staging/Pre-prod)")
+    Registry --> DeployUAT["🚀 Deploy to UAT Environment<br/>(Staging/Pre-prod)"]
     
     DeployUAT --> UATReady["✅ UAT Environment Ready<br/>service:v1.2.3 running on staging"]
     UATReady --> ManualGate["⛔ MANUAL APPROVAL GATE<br/>Business Team Reviews"]

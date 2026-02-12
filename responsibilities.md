@@ -573,10 +573,11 @@ flowchart TD
     Loop -->|Yes| D0
     Loop -->|No| D2H
     
+    style Start fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
     style D0 fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
     style D1 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
     style D2 fill:#fff3e0,stroke:#f57c00,stroke-width:3px
-    style Start fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+```
 
 
 This framework shows recruiters you understand:
