@@ -455,25 +455,27 @@ The project follows a **three-branch model** that ensures code quality, parallel
 **Simple View - Basic Flow:**
 
 ```mermaid
-gitGraph commit id: "init" 
-    branch feature/Build/Functional Testing 
-    checkout feature/user-auth 
-    commit id: "add login" 
-    commit id: "add validation" 
-    checkout main 
-    branch integration 
-    commit id: "merge features" 
-    checkout feature/user-auth 
-    commit id: "fix tests" 
-    checkout integration 
-    merge feature/user-auth 
-    commit id: "integration tests" 
-    checkout main 
-    branch release 
-    merge integration tag: "v1.0.0" 
-    checkout release 
-    commit id: "bump version" 
-    checkout main 
+gitGraph
+    commit id: "init"
+    branch feature/user-auth
+    checkout feature/user-auth
+    commit id: "add login"
+    commit id: "add validation"
+    checkout main
+    branch integration
+    checkout integration
+    commit id: "merge features"
+    checkout feature/user-auth
+    commit id: "fix tests"
+    checkout integration
+    merge feature/user-auth
+    commit id: "integration tests"
+    checkout main
+    branch release
+    checkout release
+    merge integration tag: "v1.0.0"
+    commit id: "bump version"
+    checkout main
     merge release tag: "PROD"
 ```
 
