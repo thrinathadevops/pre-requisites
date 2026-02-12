@@ -517,7 +517,8 @@ gitGraph
     %% Tagging Production Deployment
     commit id: "Production Live 🚀" tag: "PROD-v1.0.0"
 ```
-
+```mermaid
+gitGraph commit id: "init" branch feature/Build/Functional Testing checkout feature/user-auth commit id: "add login" commit id: "add validation" checkout main branch integration commit id: "merge features" checkout feature/user-auth commit id: "fix tests" checkout integration merge feature/user-auth commit id: "integration tests" checkout main branch release merge integration tag: "v1.0.0" checkout release commit id: "bump version" checkout main merge release tag: "PROD"
 ---
 
 ### Feature Branch Workflow
