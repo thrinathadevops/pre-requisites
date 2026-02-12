@@ -453,26 +453,69 @@ The project follows a **three-branch model** that ensures code quality, parallel
 ### Git Flow Visualization
 
 ```mermaid
-gitGraph commit id: "init"
-branch feature/user-auth
-checkout feature/user-auth
-commit id: "add login"
-commit id: "add validation"
-checkout main
-branch integration
-commit id: "merge features"
-checkout feature/user-auth
-commit id: "fix tests"
-checkout integration
-merge feature/user-auth
-commit id: "integration tests"
-checkout main
-branch release
-merge integration tag: "v1.0.0"
-checkout release
-commit id: "bump version"
-checkout main
-merge release tag: "PROD"
+gitGraph
+    commit id: "init (main)"
+
+    %% ----------------------------
+    %% Feature Branch (Functional Testing)
+    %% ----------------------------
+    branch feature/frontend-login
+    checkout feature/frontend-login
+    commit id: "dev: add login UI"
+    commit id: "dev: add unit tests"
+    commit id: "CI: build + smoke test"
+    commit id: "CD: deploy to QA (functional test)"
+
+    %% ----------------------------
+    %% Another Feature Branch
+    %% ----------------------------
+    checkout main
+    branch feature/backend-auth
+    checkout feature/backend-auth
+    commit id: "dev: add auth API"
+    commit id: "dev: add unit tests"
+    commit id: "CI: build + smoke test"
+    commit id: "CD: deploy to QA (functional test)"
+
+    %% ----------------------------
+    %% Integration Branch (Integration + Regression)
+    %% ----------------------------
+    checkout main
+    branch integration
+    checkout integration
+    commit id: "merge window opened"
+
+    merge feature/frontend-login
+    commit id: "CI: integration build created"
+    commit id: "CD: deploy for integration testing"
+    commit id: "CD: deploy same build for regression testing"
+
+    merge feature/backend-auth
+    commit id: "CI: rebuild after merge"
+    commit id: "CD: deploy for integration + regression"
+
+    %% ----------------------------
+    %% Release Branch (UAT + Production)
+    %% ----------------------------
+    checkout main
+    branch release/v1.0
+    checkout release/v1.0
+
+    %% Tagging Release Candidate
+    merge integration tag: "RC-1.0.0"
+
+    commit id: "CI: release build generated"
+    commit id: "CD: deploy to Stage (UAT)"
+
+    commit id: "UAT approved"
+
+    %% Tagging Final Production Release
+    commit id: "Release Ready" tag: "v1.0.0"
+
+    commit id: "CD: deploy same build to PROD"
+
+    %% Tagging Production Deployment
+    commit id: "Production Live 🚀" tag: "PROD-v1.0.0"
 ```
 
 ---
