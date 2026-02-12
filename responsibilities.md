@@ -45,15 +45,16 @@ Operations is about **rolling out that automation across environments, maintaini
 | **Development**          | **60%**      | Building automation, IaC, pipelines, monitoring, self‑healing, reliability   |
 | **Operations**           | **40%**      | Rollout, maintenance, monitoring, security, cost optimization                |
 
-
-pie showData
-    title DevOps Work Distribution
+```mermaid
+pie title DevOps Work Distribution
     "Development (Build & Improve)" : 60
     "Operations (Run & Maintain)" : 40
+```
 
 <!-- ================= DETAILED SECTION: WHAT I DO AS DEVOPS ================= -->
 
-🚀 What DevOps Work Actually Looks Like
+### 🚀 What DevOps Work Actually Looks Like
+
 DevOps responsibilities span both development and operations, but a major part of the impact comes from building and evolving automation, not just running manual tasks.
 
 1️⃣ Development Responsibilities (≈ 60%)
@@ -225,9 +226,11 @@ Identify waste
 
 Use automation to enforce cost guardrails
 
-🔁 End‑to‑End DevOps Lifecycle
+### 🔁 End‑to‑End DevOps Lifecycle
+
 DevOps work is about owning the full lifecycle, not just individual tasks.
 
+```mermaid
 flowchart LR
     A[Build Automation] --> B[Implement Across Environments]
     B --> C[Maintain & Upgrade]
@@ -235,22 +238,19 @@ flowchart LR
     D --> E[Secure & Harden]
     E --> F[Optimize Cost & Capacity]
     F --> A[Continuous Improvement]
+```
 
-Build – Design and develop automation, pipelines, and infrastructure as code
-
-Implement – Roll out automation consistently across QA, staging, and production
-
-Maintain – Backup, upgrade, patch, and evolve systems as requirements grow
-
-Monitor – Observe health, performance, and reliability across the stack
-
-Secure – Enforce IAM, patching, vulnerability management, and compliance
-
-Optimize – Continuously refine for cost, scale, and efficiency
+- **Build** – Design and develop automation, pipelines, and infrastructure as code
+- **Implement** – Roll out automation consistently across QA, staging, and production
+- **Maintain** – Backup, upgrade, patch, and evolve systems as requirements grow
+- **Monitor** – Observe health, performance, and reliability across the stack
+- **Secure** – Enforce IAM, patching, vulnerability management, and compliance
+- **Optimize** – Continuously refine for cost, scale, and efficiency
 
 <!-- ================= PROJECT / CASE-STUDY SNIPPET ================= -->
 
-📂 How This Looks in Real Projects
+### 📂 How This Looks in Real Projects
+
 In real projects, this DevOps role typically includes:
 
 Designing and building Terraform + Ansible stacks for multi‑env infrastructure
@@ -487,16 +487,14 @@ timeline
          : Build Once → Deploy Many
     Day 2 : Operations & Maintenance
          : Monitor, Maintain, Secure, Improve
+```
 
 This framework shows recruiters you understand:
 
-✅ Strategic thinking (Day 0 planning)
-
-✅ Engineering skills (Day 1 automation)
-
-✅ Production ownership (Day 2 operations)
-
-✅ Full lifecycle responsibility
+- ✅ Strategic thinking (Day 0 planning)
+- ✅ Engineering skills (Day 1 automation)
+- ✅ Production ownership (Day 2 operations)
+- ✅ Full lifecycle responsibility
 
 
 ## 🌐 Real-World Example: 3-Tier Web App (Netflix-Style)
@@ -505,7 +503,6 @@ Let's make this **concrete** for recruiters. Here's how the **Day 0 → Day 2 li
 
 **The Product**: A streaming web app with **3 microservices layers**:
 
-
 Frontend (React/Node.js) → Backend (Spring Boot/Java) → Database (MySQL)
 
 
@@ -513,15 +510,16 @@ Frontend (React/Node.js) → Backend (Spring Boot/Java) → Database (MySQL)
 
 ### 🏗️ **Architecture Overview**
 
+```
 ┌─────────────────┐ ┌──────────────────┐ ┌─────────────────┐
-│ Frontend │ │ Backend │ │ MySQL │
-│ React.js │◄──►│ Spring Boot │◄──►│ Structured DB │
-│ (Node.js) │ │ (Java) │ │ │
+│ Frontend        │ │ Backend          │ │ MySQL           │
+│ React.js        │◄──►│ Spring Boot      │◄──►│ Structured DB   │
+│ (Node.js)       │ │ (Java)           │ │                 │
 └─────────────────┘ └──────────────────┘ └─────────────────┘
 │ │ │
 ▼ ▼ ▼
 [EC2/Fargate/K8s] [EC2/Fargate/K8s] [RDS/Aurora MySQL]
-
+```
 
 **Each layer = 1 microservice** (scalable independently):
 - **Frontend**: React.js UI (Node.js runtime) – User interface, authentication
@@ -660,13 +658,15 @@ Integration ──(QA)──> Regression ──(QA)──> UAT ──(Stage)─�
 
 ### 🏗️ **4 Environments Strategy**
 
+```
 ┌─────────────┐ ┌─────────────┐ ┌─────────────────┐ ┌──────────────┐
-│ DEV │ │ QA │ │ STAGE (Pre-Prod)│ │ PRODUCTION │
-│ │ │ │ │ │ │ │
-│ - Dev work │───▶│ - Functional │───▶│ - UAT │───▶│ - Live users │
-│ - Smoke test│ │ - Integration│ │ - Prod mirror │ │ - Real traffic│
-│ │ │ - Regression │ │ - Load testing │ │ │
+│ DEV         │ │ QA          │ │ STAGE (Pre-Prod)│ │ PRODUCTION   │
+│             │ │             │ │                 │ │              │
+│ - Dev work  │───▶│ - Functional│───▶│ - UAT           │───▶│ - Live users │
+│ - Smoke test│ │ - Integration│ │ - Prod mirror   │ │ - Real traffic│
+│             │ │ - Regression│ │ - Load testing  │ │              │
 └─────────────┘ └─────────────┘ └─────────────────┘ └──────────────┘
+```
 
 
 **Each environment mirrors the full 3-tier stack**:
@@ -680,35 +680,36 @@ Frontend (React/Node) + Backend (Spring Boot) + MySQL (RDS)
 
 **Independent pipelines** for each microservice, triggered by Git commits:
 
-Frontend Pipeline: Backend Pipeline:
-┌─────────────────┐ ┌──────────────────┐
-│ Git Push │ │ Git Push │
-│ React/Node code │ │ Spring Boot code │
-└─────────┬───────┘ └─────────┬─────────┘
-▼ ▼
-┌─────────────────┐ ┌──────────────────┐
-│ 1. Build │ │ 1. Build │
-│ 2. Unit Test │ │ 2. Unit Test │
-│ 3. Docker Image │ │ 3. Docker Image │
-└─────────┬───────┘ └─────────┬─────────┘
-▼ ▼
-┌─────────────────┐ ┌──────────────────┐
-│ 4. Smoke Test │ ───► DEV ─────────▶│ 4. Smoke Test │
-└─────────┬───────┘ └─────────┬─────────┘
-▼ ▼
-┌─────────────────┐ ┌──────────────────┐
-│ 5. QA Tests │ ───► QA ──────────▶│ 5. QA Tests │
-│ Func/Int/Reg │ │ Func/Int/Reg │
-└─────────┬───────┘ └─────────┬─────────┘
-▼ ▼
-┌─────────────────┐ ┌──────────────────┐
-│ 6. UAT Approval │ ───► STAGE ───────▶│ 6. UAT Approval │
-└─────────┬───────┘ └─────────┬─────────┘
-▼ ▼
-┌─────────────────┐ ┌──────────────────┐
-│ 7. Prod Deploy │ ───► PROD ────────▶│ 7. Prod Deploy │
-└─────────────────┘ └──────────────────┘
-
+```
+Frontend Pipeline:                Backend Pipeline:
+┌─────────────────┐             ┌──────────────────┐
+│ Git Push        │             │ Git Push         │
+│ React/Node code │             │ Spring Boot code │
+└─────────┬───────┘             └─────────┬────────┘
+          ▼                               ▼
+┌─────────────────┐             ┌──────────────────┐
+│ 1. Build        │             │ 1. Build         │
+│ 2. Unit Test    │             │ 2. Unit Test     │
+│ 3. Docker Image │             │ 3. Docker Image  │
+└─────────┬───────┘             └─────────┬────────┘
+          ▼                               ▼
+┌─────────────────┐             ┌──────────────────┐
+│ 4. Smoke Test   │ ───► DEV ───┤ 4. Smoke Test    │
+└─────────┬───────┘             └─────────┬────────┘
+          ▼                               ▼
+┌─────────────────┐             ┌──────────────────┐
+│ 5. QA Tests     │ ───► QA ────┤ 5. QA Tests      │
+│ Func/Int/Reg    │             │ Func/Int/Reg     │
+└─────────┬───────┘             └─────────┬────────┘
+          ▼                               ▼
+┌─────────────────┐             ┌──────────────────┐
+│ 6. UAT Approval │ ──► STAGE ──┤ 6. UAT Approval  │
+└─────────┬───────┘             └─────────┬────────┘
+          ▼                               ▼
+┌─────────────────┐             ┌──────────────────┐
+│ 7. Prod Deploy  │ ──► PROD ───┤ 7. Prod Deploy   │
+└─────────────────┘             └──────────────────┘
+```
 
 **Database changes** (MySQL schema/migrations) follow the **same pipeline**.
 
@@ -737,9 +738,11 @@ stages:
       - deploy-stage: helm upgrade frontend stage-namespace
       - uat-approval: manual-approval-required
       - deploy-prod: blue-green-deployment production
+```
 
-📊 Visual Pipeline Flow
+### 📊 Visual Pipeline Flow
 
+```mermaid
 graph LR
     A[Code Commit<br/>Frontend OR Backend] --> B[Build + Unit Test]
     B --> C[Docker Image<br/>Push to Registry]
@@ -750,6 +753,7 @@ graph LR
     
     style A fill:#e1f5fe
     style G fill:#c8e6c9
+```
 
 | DevOps Skill          | What You Automated                                  |
 | --------------------- | --------------------------------------------------- |
@@ -769,9 +773,10 @@ Developers write code **continuously**, but QA needs a **production-ready build*
 
 ### 🎯 **Core Activities You Automate**
 
+```
 Developer Code ───► BUILD ───► TEST ───► DEPLOY
 (Git commit) (Docker) (QA) (Production)
-
+```
 
 | **Activity**    | **What You Do**                                                                 | **Tool**              |
 |-----------------|---------------------------------------------------------------------------------|-----------------------|
@@ -784,6 +789,7 @@ Developer Code ───► BUILD ───► TEST ───► DEPLOY
 
 ### 🔬 **From Code Commit to Production (Step-by-Step)**
 
+```
 DEV WRITES CODE → Git Push (React OR Spring Boot)
 
 BUILD PIPELINE triggers automatically:
@@ -793,12 +799,10 @@ BUILD PIPELINE triggers automatically:
 ├─ SMOKE: Deploy to Dev → Health checks pass
 └─ PUBLISH: Push image to ECR (tagged: v1.2.3)
 
-QA PULLS BUILD → Runs full test suite on QA env
-
 UAT APPROVAL → Manual gate on Stage env
 
 PRODUCTION DEPLOY → Blue-green rollout
-
+```
 
 **QA never sees raw code** – they get a **complete, tested Docker image** ready for their environment.
 
@@ -817,9 +821,11 @@ graph LR
     
     style A fill:#e3f2fd
     style G fill:#e8f5e8
+```
 
-🏗️ Real Pipeline Code Example
+### 🏗️ Real Pipeline Code Example
 
+```yaml
 # GitHub Actions / Jenkins Pipeline
 name: Continuous Delivery
 on: [push]
@@ -861,5 +867,6 @@ jobs:
       run: helm upgrade frontend qa-namespace --set image.tag=${{ github.sha }}
     - name: Wait for QA Approval
       uses: trstringer/manual-approval@v1
+```
 
 
