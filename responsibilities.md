@@ -386,26 +386,18 @@ Operations ensure that **what you built continues to work, scale, and stay secur
 flowchart LR
     A[Problem to Solve] --> B[Design & Architecture]
     B --> C[Development]
-    C --> D[Implementation<br/>(Deploy Many Times)]
-    D --> E[Operations<br/>(Run, Monitor, Secure)]
+    C --> D["Implementation<br/>(Deploy Many Times)"]
+    D --> E["Operations<br/>(Run, Monitor, Secure)"]
     E --> F[Feedback & Improvements]
     F --> B
+```
 
-Design & Architecture – Decide how to solve the problem using best practices and cloud‑native patterns
+**Lifecycle Explanation:**
 
-Development – Build the automation: IaC, pipelines, containers, monitoring
-
-Implementation – Use the same code to roll out multiple environments
-
-Operations – Maintain, monitor, secure, and continuously improve the system
-
-
-## 📅 DevOps Day 0 → Day 2 Lifecycle
-
-DevOps projects follow a clear **Day 0 → Day 2** progression that every recruiter understands:
-
-Day 0: Planning & Design → Day 1: Development & Implementation → Day 2: Operations & Maintenance
-
+- **Design & Architecture** – Decide how to solve the problem using best practices and cloud‑native patterns
+- **Development** – Build the automation: IaC, pipelines, containers, monitoring
+- **Implementation** – Use the same code to roll out multiple environments
+- **Operations** – Maintain, monitor, secure, and continuously improve the system
 
 ---
 
@@ -744,12 +736,12 @@ stages:
 
 ```mermaid
 graph LR
-    A[Code Commit<br/>Frontend OR Backend] --> B[Build + Unit Test]
-    B --> C[Docker Image<br/>Push to Registry]
-    C --> D[Smoke Test<br/>DEV Environment]
-    D --> E[QA Tests<br/>Functional + Integration + Regression]
-    E --> F[UAT<br/>STAGE Environment]
-    F --> G[Production Deploy<br/>Blue-Green]
+    A["Code Commit<br/>Frontend OR Backend"] --> B[Build + Unit Test]
+    B --> C["Docker Image<br/>Push to Registry"]
+    C --> D["Smoke Test<br/>DEV Environment"]
+    D --> E["QA Tests<br/>Functional + Integration + Regression"]
+    E --> F["UAT<br/>STAGE Environment"]
+    F --> G["Production Deploy<br/>Blue-Green"]
     
     style A fill:#e1f5fe
     style G fill:#c8e6c9
@@ -812,12 +804,12 @@ PRODUCTION DEPLOY → Blue-green rollout
 
 ```mermaid
 graph LR
-    A[Developer<br/>Code Commit] --> B[Automated Build<br/>Docker Image]
-    B --> C[Security Scans<br/>Trivy/Checkov]
-    C --> D[Smoke Tests<br/>Dev Environment]
-    D --> E[QA Testing<br/>Functional/Integration/Regression]
-    E --> F[UAT Approval<br/>Stage Environment]
-    F --> G[Production Deploy<br/>Blue-Green Rollout]
+    A["Developer<br/>Code Commit"] --> B["Automated Build<br/>Docker Image"]
+    B --> C["Security Scans<br/>Trivy/Checkov"]
+    C --> D["Smoke Tests<br/>Dev Environment"]
+    D --> E["QA Testing<br/>Functional/Integration/Regression"]
+    E --> F["UAT Approval<br/>Stage Environment"]
+    F --> G["Production Deploy<br/>Blue-Green Rollout"]
     
     style A fill:#e3f2fd
     style G fill:#e8f5e8
